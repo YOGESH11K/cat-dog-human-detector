@@ -1,12 +1,15 @@
 const video = document.getElementById("video");
-const captureBtn = document.getElementById("captureBtn");
-const result = document.getElementById("result");
 const statusEl = document.getElementById("status");
+const result = document.getElementById("result");
 
 const EMOJI = { cat: "🐱", dog: "🐶", human: "🧑" };
+const DETECT_INTERVAL_MS = 800;
+
+let running = false;
+let busy = false;
 
 async function initCamera() {
-  statusEl.textContent = "Requesting camera access…";
+  statusEl.textContent = "Requesting camera access...";
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -14,11 +17,11 @@ async function initCamera() {
     });
     video.srcObject = stream;
     await video.play();
-    statusEl.textContent = "Camera ready. Point it at a cat, dog, or person.";
-    captureBtn.disabled = false;
+    statusEl.textContent = "Live detection running - point at a cat, dog, or human";
+    running = true;
+    loop();
   } catch (err) {
     statusEl.textContent = "Camera unavailable: " + err.message;
-    captureBtn.disabled = true;
   }
 }
 
@@ -27,23 +30,38 @@ function captureFrame() {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext("2d").drawImage(video, 0, 0);
-  return canvas.toDataURL("image/jpeg", 0.85);
+  return canvas.toDataURL("image/jpeg", 0.7);
 }
 
 async function detect(imageDataUrl) {
-  const res = await fetch(API_BASE + "/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ image: imageDataUrl }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || ("HTTP " + res.status));
+  try {
+    const res = await fetch(API_BASE + "/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: imageDataUrl }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && data.prediction) {
+      render(data);
+      statusEl.textContent = "Sees: " + data.prediction;
+    }
+  } catch (err) {
+    /* transient network error - keep last result */
   }
-  return res.json();
 }
 
-function render(result, data) {
+async function loop() {
+  if (busy) return;
+  busy = true;
+  if (running && video.readyState >= 2) {
+    await detect(captureFrame());
+  }
+  busy = false;
+  if (running) setTimeout(loop, DETECT_INTERVAL_MS);
+}
+
+function render(data) {
   const label = data.prediction;
   const conf = Math.round(data.confidence * 100);
   result.innerHTML = `
@@ -54,20 +72,5 @@ function render(result, data) {
     <div class="fact">${data.fun_fact || ""}</div>
   `;
 }
-
-captureBtn.addEventListener("click", async () => {
-  captureBtn.disabled = true;
-  statusEl.textContent = "Detecting…";
-  try {
-    const data = await detect(captureFrame());
-    render(result, data);
-    statusEl.textContent = "Detected: " + data.prediction;
-  } catch (err) {
-    result.innerHTML = `<div class="error">Detection failed: ${err.message}</div>`;
-    statusEl.textContent = err.message;
-  } finally {
-    captureBtn.disabled = false;
-  }
-});
 
 initCamera();
