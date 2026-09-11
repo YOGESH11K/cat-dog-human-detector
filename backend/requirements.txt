@@ -1,6 +1,5 @@
 fastapi>=0.110
-uvicorn[standard]>=0.29
 numpy>=1.24
 pillow>=9.0
 pydantic>=2.0
-tflite-runtime>=2.14
+ai-edge-litert>=2.0

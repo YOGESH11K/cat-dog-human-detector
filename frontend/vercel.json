@@ -1,8 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "app.py": {
-      "maxDuration": 300
-    }
-  }
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://stem-detection-api.vercel.app/api/$1" }
+  ]
 }

@@ -1,12 +1,9 @@
 """
-🐱🐶🧑 Cat / Dog / Human detection API.
+🐱🐶🧑 Cat / Dog / Human detection API for Vercel Functions.
 
-Runs a lightweight TFLite MobileNetV2 classifier on hosted servers (Render).
-
-Endpoints:
-    GET  /            -> API info
-    GET  /health      -> server + model status
-    POST /predict     -> { image: "<base64 jpeg/png>" } -> classification
+Deployed as a standalone FastAPI app (Vercel detects the `app` instance
+and serves it as a single Python Function). Routes are prefixed with
+`/api` so the frontend can proxy requests through `/api/*`.
 """
 
 import base64
@@ -22,9 +19,12 @@ import numpy as np
 from PIL import Image
 
 try:
-    from tflite_runtime.interpreter import Interpreter
+    from ai_edge_litert.interpreter import Interpreter
 except ImportError:
-    from tensorflow.lite.python.interpreter import Interpreter  # local fallback
+    try:
+        from tflite_runtime.interpreter import Interpreter
+    except ImportError:
+        from tensorflow.lite.python.interpreter import Interpreter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(HERE, "model", "cat_dog_model.tflite")
@@ -86,8 +86,7 @@ def predict_image(img):
     input_details = interp.get_input_details()
     output_details = interp.get_output_details()
 
-    tensor = preprocess(img)
-    interp.set_tensor(input_details[0]["index"], tensor)
+    interp.set_tensor(input_details[0]["index"], preprocess(img))
     interp.invoke()
     out = interp.get_tensor(output_details[0]["index"])[0]
 
@@ -106,16 +105,16 @@ def predict_image(img):
     }
 
 
-@app.get("/")
+@app.get("/api")
 def root():
     return {
         "name": "Cat / Dog / Human Detector API",
         "classes": CLASS_NAMES,
-        "endpoints": ["/predict", "/health"],
+        "endpoints": ["/api/predict", "/api/health"],
     }
 
 
-@app.get("/health")
+@app.get("/api/health")
 def health():
     ok = os.path.exists(MODEL_PATH)
     return {
@@ -126,7 +125,7 @@ def health():
     }
 
 
-@app.post("/predict")
+@app.post("/api/predict")
 def predict(req: PredictRequest):
     data = req.image
     if data.startswith("data:"):
