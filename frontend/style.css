@@ -1,0 +1,157 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  font-size: 2rem;
+  letter-spacing: 0.5px;
+}
+
+header p {
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.camera,
+.result {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 16px;
+  flex: 1 1 360px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+video {
+  width: 100%;
+  max-height: 320px;
+  border-radius: 10px;
+  background: #000;
+  object-fit: contain;
+}
+
+canvas {
+  display: none;
+}
+
+button {
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 26px;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 0.15s, filter 0.15s;
+}
+
+button:hover {
+  transform: scale(1.04);
+  filter: brightness(1.08);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  text-align: center;
+}
+
+.result .placeholder {
+  opacity: 0.5;
+  font-size: 1.1rem;
+  padding: 40px 0;
+}
+
+.result.emote {
+  font-size: 4rem;
+}
+
+.result.prediction {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.result.confidence {
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+.track {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.track-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+  transition: width 0.4s ease;
+}
+
+.fact {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-style: italic;
+  text-align: center;
+  max-width: 320px;
+}
+
+.error {
+  color: #ff7b7b;
+  font-style: italic;
+}
+
+.status {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  text-align: center;
+}
+
+footer {
+  margin-top: 20px;
+  font-size: 0.8rem;
+  opacity: 0.55;
+}

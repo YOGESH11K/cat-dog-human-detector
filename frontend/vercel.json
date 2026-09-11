@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://stem-detection-api.onrender.com/$1" }
+  ]
+}

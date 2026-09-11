@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stem Detection - Cat / Dog / Human</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🐱🐶🧑 Stem Detection</h1>
+    <p>Real-time Cat / Dog / Human classifier</p>
+  </header>
+
+  <main>
+    <section class="camera">
+      <video id="video" autoplay playsinline muted></video>
+      <button id="captureBtn">📸 Capture &amp; Detect</button>
+      <p class="hint">Allow camera access, point at a cat, dog, or person, and press Capture.</p>
+    </section>
+
+    <section class="result" id="result">
+      <div class="placeholder">No prediction yet</div>
+    </section>
+  </main>
+
+  <p class="status" id="status">Loading model…</p>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
